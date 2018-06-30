@@ -10,8 +10,8 @@
     android:layout_gravity="center"
     android:clipToPadding="false"
     tools:itemCount="10"
-    android:paddingTop="60dp"
-    android:background="#000000"
+    android:paddingTop="@dimen/padding_top"
+    android:background="@color/black"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 

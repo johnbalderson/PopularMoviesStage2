@@ -1,6 +1,7 @@
 package com.johnbalderson.popularmoviesstage2;
 
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
@@ -9,15 +10,18 @@ import android.os.Bundle;
 import android.databinding.DataBindingUtil;
 
 
+import android.os.Parcelable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.text.Layout;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.johnbalderson.popularmoviesstage2.adapters.ReviewAdapter;
@@ -57,6 +61,8 @@ public class MovieDetailsActivity extends AppCompatActivity
 
     private String mApiKey = "";
     private String saveTitle = "";
+    Parcelable mReviewState;
+    Parcelable mVideoState;
     private MovieDetailsBinding mBinding;
 
     private List<Review> movieReviewItems;
@@ -68,6 +74,14 @@ public class MovieDetailsActivity extends AppCompatActivity
     private ImageButton buttonStar;
 
     private Movie movieItem;
+
+    RecyclerView.LayoutManager mReviewLayout;
+    RecyclerView.LayoutManager mVideoLayout;
+
+    String REVIEW_STATE_KEY = "";
+    String VIDEO_STATE_KEY = "";
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,19 +126,20 @@ public class MovieDetailsActivity extends AppCompatActivity
             RecyclerView mMovieReviewList = findViewById(R.id.rv_reviews);
             LinearLayoutManager layoutManagerReview = new LinearLayoutManager(this);
             mMovieReviewList.setLayoutManager(layoutManagerReview);
+            mReviewLayout = layoutManagerReview;
             mMovieReviewList.setHasFixedSize(false);
             movieReviewAdapter = new ReviewAdapter(movieReviewItems, this);
             mMovieReviewList.setAdapter(movieReviewAdapter);
+
 
             // set up adapter for trailers
             RecyclerView trailerList = findViewById(R.id.rv_trailers);
             LinearLayoutManager layoutManagerVideo = new LinearLayoutManager(this);
             trailerList.setLayoutManager(layoutManagerVideo);
+            mVideoLayout = layoutManagerVideo;
             trailerList.setHasFixedSize(false);
             trailerAdapter = new TrailerAdapter(trailerItems, this, this);
             trailerList.setAdapter(trailerAdapter);
-
-
 
             // get reviews and trailers on background thread
             GetReviewsAndTrailers();
@@ -132,6 +147,44 @@ public class MovieDetailsActivity extends AppCompatActivity
             populateUI();
         }
     }
+
+    protected void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+
+        // Save review state
+        mReviewState = mReviewLayout.onSaveInstanceState();
+        state.putParcelable(REVIEW_STATE_KEY,mReviewState);
+
+        // Save video state
+        mVideoState = mVideoLayout.onSaveInstanceState();
+        state.putParcelable(VIDEO_STATE_KEY, mVideoState);
+
+    }
+
+    protected void onRestoreInstanceState(Bundle state) {
+        super.onRestoreInstanceState(state);
+
+        // Retrieve review/video states and positions
+
+        if(state != null)
+            mReviewState = state.getParcelable(REVIEW_STATE_KEY);
+            mVideoState = state.getParcelable(VIDEO_STATE_KEY);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (mReviewState != null) {
+            mReviewLayout.onRestoreInstanceState(mReviewState);
+        }
+
+        if (mVideoState != null) {
+            mVideoLayout.onRestoreInstanceState(mVideoState);
+        }
+    }
+
 
     private void GetReviewsAndTrailers() {
 
@@ -147,10 +200,28 @@ public class MovieDetailsActivity extends AppCompatActivity
 
     }
 
-    // build the video URL
+    // build the video URL for either YouTube or browser
     @Override
     public void OnListItemClick(Trailer trailer) {
-        this.startActivity(new Intent(Intent.ACTION_VIEW, NetworkUtils.buildVideoURL(trailer.getKey())));
+
+        /**
+         * Picking app or browser from
+         * https://stackoverflow.com/questions/574195/android-youtube-app-play-video-intent
+         */
+
+         // this.startActivity(new Intent(Intent.ACTION_VIEW, NetworkUtils.buildYouTubeURL(trailer.getKey())));
+
+        Intent youTubeAppIntent = new Intent(Intent.ACTION_VIEW,
+                NetworkUtils.buildYouTubeURL(trailer.getKey()));
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW,
+                NetworkUtils.buildVideoURL(trailer.getKey()));
+
+        // Try to open in YouTube app first, if not available open in browser
+        try {
+            this.startActivity(youTubeAppIntent);
+        } catch (ActivityNotFoundException e) {
+            this.startActivity(browserIntent);
+        }
     }
 
 
@@ -267,6 +338,8 @@ public class MovieDetailsActivity extends AppCompatActivity
             }
 
          }
+
+
 
     // set the color of the favorite star on or off
     private void setFavoriteBackgroundColor() {

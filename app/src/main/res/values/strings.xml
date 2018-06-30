@@ -47,8 +47,8 @@
 
     <!-- Used for Sorting -->
 
-    <string name="popular">popular</string>
-    <string name="rating">top_rated</string>
+    <string name="popular">Popular</string>
+    <string name="rating">Top Rated</string>
     <string name="favorite">favorite</string>
 
 </resources>

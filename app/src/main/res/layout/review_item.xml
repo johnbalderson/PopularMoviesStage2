@@ -8,10 +8,10 @@
 
         <TextView
             android:id="@+id/tv_review_author"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
-            android:textSize="28sp"
+            android:layout_marginTop="@dimen/text_margin"
+            android:layout_marginLeft="@dimen/padding_2dp"
+            android:layout_marginRight="@dimen/padding_2dp"
+            android:textSize="@dimen/text_size_28"
             android:textColor="@color/goldenrod"
             android:textStyle="bold"
             android:layout_width="match_parent"
@@ -19,22 +19,22 @@
 
         <TextView
             android:id="@+id/tv_review_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="@dimen/text_margin"
             android:layout_below="@id/tv_review_author"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
-            android:layout_marginBottom="12dp"
-            android:textSize="16sp"
+            android:layout_marginLeft="@dimen/padding_2dp"
+            android:layout_marginRight="@dimen/padding_2dp"
+            android:layout_marginBottom="@dimen/padding_bottom"
+            android:textSize="@dimen/text_size_16"
             android:layout_width="match_parent"
             android:textColor="@color/white"
             android:layout_height="wrap_content"/>
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
-            android:layout_marginBottom="8dp"
+            android:layout_height="@dimen/padding_view_height"
+            android:layout_marginLeft="@dimen/padding_2dp"
+            android:layout_marginRight="@dimen/padding_2dp"
+            android:layout_marginBottom="@dimen/padding_bottom_8"
             android:background="@color/light_green"/>
 
 

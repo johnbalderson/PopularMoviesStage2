@@ -37,6 +37,8 @@ public class NetworkUtils {
     private final static String BASE_URL_TRAILER_IMAGE = "http://img.youtube.com/vi/";
     // for building URL for actual Youtube trailer
     private final static String BASE_URL_TRAILER_VIDEO = "https://www.youtube.com/watch?v=";
+    // for building URL directly from YouTube
+    private final static String BASE_URL_YOUTUBE = "vnd.youtube:";
 
     //The width of the poster
     private final static String WIDTH = "w185";
@@ -80,12 +82,17 @@ public class NetworkUtils {
         return getUrl(builtUri);
     }
 
-    // build URL for YouTube trailers
+    // build URL for YouTube trailers from browser
     public static Uri buildVideoURL(String videoKey) {
-        String path = BASE_URL_TRAILER_VIDEO + videoKey;
-        return Uri.parse(path);
+        String browser_path = BASE_URL_TRAILER_VIDEO + videoKey;
+        return Uri.parse(browser_path);
     }
 
+    // build URL for YouTube trailers from YouTube
+    public static Uri buildYouTubeURL(String videoKey) {
+        String youtube_path = BASE_URL_YOUTUBE + videoKey;
+        return Uri.parse(youtube_path);
+    }
 
     // Return result from HTTP response
 

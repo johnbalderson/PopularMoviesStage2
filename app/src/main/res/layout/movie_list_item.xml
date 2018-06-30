@@ -11,15 +11,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:paddingLeft="8dp"
-        android:textColor="#FFFFFF"
+        android:paddingLeft="@dimen/padding_left"
+        android:textColor="@color/white"
         tools:text="@string/movie_poster_content_description_text" />
 
 
     <ImageView
         android:id="@+id/iv_item_poster"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="@dimen/zero_padding"
         android:layout_gravity="center"
         android:layout_weight="50"
         android:contentDescription="@string/poster_image_content_description"

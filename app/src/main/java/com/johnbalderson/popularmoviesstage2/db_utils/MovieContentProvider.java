@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,18 +24,16 @@ import android.support.annotation.Nullable;
 
 public class MovieContentProvider extends ContentProvider {
 
-    private static final int MOVIES = 100;
+    private static final int MOVIE = 100;
     private static final int MOVIE_ID = 101;
-    private static final UriMatcher sUriMatcher = buildUriMatcher();
+    // private static final UriMatcher sUriMatcher = buildUriMatcher();
+    private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     private MovieDbHelper movieDbHelper;
 
-    private static UriMatcher buildUriMatcher() {
-        UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        uriMatcher.addURI(MovieDBLayout.AUTHORITY, MovieDBLayout.PATH_ENTRY, MOVIES);
-
-        uriMatcher.addURI(MovieDBLayout.AUTHORITY, MovieDBLayout.PATH_ENTRY + "/*", MOVIE_ID);
-        return uriMatcher;
+    static {
+        sUriMatcher.addURI(MovieDBLayout.AUTHORITY, MovieDBLayout.MovieTable.TABLE_NAME, MOVIE);
+        sUriMatcher.addURI(MovieDBLayout.AUTHORITY, MovieDBLayout.MovieTable.TABLE_NAME + "/#", MOVIE_ID);
     }
 
     @Override
@@ -50,28 +49,41 @@ public class MovieContentProvider extends ContentProvider {
                         @Nullable String sortOrder) {
 
         final SQLiteDatabase db = movieDbHelper.getReadableDatabase();
-        int match = sUriMatcher.match(uri);
-        Cursor retCursor;
 
-        switch (match) {
-            case MOVIES:
-                retCursor = db.query(MovieDBLayout.MovieTable.TABLE_NAME,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null);
+        // Instantiate a query builder and set the table to 'movies'
+        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+        queryBuilder.setTables(MovieDBLayout.MovieTable.TABLE_NAME);
+        Cursor cursor;
 
-
+        switch (sUriMatcher.match(uri)) {
+            case MOVIE:
+                // The queryBuilder is already set for this
+                break;
+            case MOVIE_ID:
+                // Append a WHERE clause to queryBuilder
+                queryBuilder.appendWhere(MovieDBLayout.MovieTable.COLUMN_ID + "="
+                        + uri.getLastPathSegment());
                 break;
             default:
-                throw new UnsupportedOperationException("Unknown URI: " + uri);
+                throw new IllegalArgumentException("Unknown Uri: " + uri);
         }
-        retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+        // Execute query
+        cursor = queryBuilder.query(db,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder);
 
-        return retCursor;
+        if(getContext() != null) {
+            cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        }
+
+        return cursor;
     }
+
+
 
     @Nullable
     @Override
@@ -87,7 +99,7 @@ public class MovieContentProvider extends ContentProvider {
         int match = sUriMatcher.match(uri);
         Uri returnUri;
         switch (match) {
-            case MOVIES:
+            case MOVIE:
                 long id = db.insert(MovieDBLayout.MovieTable.TABLE_NAME,
                         null, values);
                 if (id > 0) {
@@ -131,6 +143,6 @@ public class MovieContentProvider extends ContentProvider {
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values,
                       @Nullable String selection, @Nullable String[] selectionArgs) {
-        return 0;
+        throw new RuntimeException("Method update() is not implemented.");
     }
 }

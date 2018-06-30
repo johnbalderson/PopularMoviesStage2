@@ -5,13 +5,14 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/movie_details_sv"
         android:background="@color/colorPrimary">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="@dimen/padding">
 
 
             <TextView
@@ -22,8 +23,8 @@
                 android:layout_marginTop="30dp"
                 android:layout_marginBottom="15sp"
                 android:scaleType="center"
-                android:textColor="#FFFFFF"
-                android:textSize="28sp"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_28"
                 android:textStyle="bold" />
 
 
@@ -44,7 +45,7 @@
                     android:id="@+id/movie_info"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_margin="15dp"
+                    android:layout_margin="@dimen/layout_margin"
                     android:gravity="top"
                     android:orientation="vertical">
 
@@ -53,28 +54,28 @@
                         android:id="@+id/release_date_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginRight="15dp"
+                        android:layout_marginRight="@dimen/layout_margin"
                         android:text="@string/release_date_label"
                         android:textColor="@color/goldenrod"
-                        android:textSize="22sp"
+                        android:textSize="@dimen/text_size_22"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tv_release_date"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10sp"
-                        android:textColor="#FFFFFF"
-                        android:textSize="18sp" />
+                        android:layout_marginTop="@dimen/text_margin"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_18" />
 
                     <TextView
                         android:id="@+id/ratings_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
+                        android:layout_marginTop="@dimen/text_margin"
                         android:text="@string/ratings_label"
                         android:textColor="@color/goldenrod"
-                        android:textSize="22sp"
+                        android:textSize="@dimen/text_size_22"
                         android:textStyle="bold" />
 
 
@@ -82,18 +83,18 @@
                         android:id="@+id/tv_user_rating"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10sp"
+                        android:layout_marginTop="@dimen/text_margin"
                         android:textColor="@color/white"
-                        android:textSize="18sp" />
+                        android:textSize="@dimen/text_size_18" />
 
                     <TextView
                         android:id="@+id/favorite_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10sp"
+                        android:layout_marginTop="@dimen/text_margin"
                         android:text="@string/add_to_favorites_label"
                         android:textColor="@color/green"
-                        android:textSize="22sp"
+                        android:textSize="@dimen/text_size_22"
                         android:textStyle="bold" />
 
                     <ImageButton
@@ -110,11 +111,11 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15sp"
-                android:paddingTop="16dp"
+                android:layout_marginTop="@dimen/text_margin"
+                android:paddingTop="@dimen/padding"
                 android:text="@string/synopsis_label"
-                android:textColor="#FFFFFF"
-                android:textSize="22sp"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_22"
                 android:textStyle="bold" />
 
             <TextView
@@ -122,7 +123,7 @@
                 style="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#FFFFFF"/>
+                android:textColor="@color/white"/>
 
 
 
@@ -132,9 +133,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/trailers_label"
-                android:layout_marginTop="15sp"
+                android:layout_marginTop="@dimen/text_margin"
                 android:textColor="@color/white"
-                android:textSize="22sp"
+                android:textSize="@dimen/text_size_22"
                 android:textStyle="bold"/>
 
 
@@ -151,9 +152,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/reviews_label"
-                android:layout_marginTop="15sp"
+                android:layout_marginTop="@dimen/text_margin"
                 android:textColor="@color/white"
-                android:textSize="22sp"
+                android:textSize="@dimen/text_size_22"
                 android:textStyle="bold"/>
 
             <android.support.v7.widget.RecyclerView
@@ -162,8 +163,6 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="start"
                 android:clipToPadding="true"/>
-
-
         </LinearLayout>
     </ScrollView>
 </layout>

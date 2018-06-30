@@ -9,13 +9,21 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.johnbalderson.popularmoviesstage2.db_utils.MovieDBLayout;
@@ -32,26 +40,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@SuppressWarnings("DanglingJavadoc")
+
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ListItemClickListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-
     private String mApiKey = "";
-    
+
     // sort parameters
     private static final String SORT_POPULAR = "popular";
     private static final String SORT_TOP_RATED = "top_rated";
     private static final String FAVORITE = "Favorite";
     private static String currentSortType = SORT_POPULAR;
-    
+
     private static final String MOVIE_ITEMS = "movie items";
     private static final String CURRENT_SORT = "current sort";
-    
+
     private ArrayList<Movie> movieItems;
 
     private MovieAdapter mMovieAdapter;
+    RecyclerView mMovieItemList;
+
+    // save Layout Manager and layout state on rotation of device/emulator
+    private GridLayoutManager mGridLayoutManager;
+    private Parcelable mLayoutManagerState;
+
+
 
 
     /**
@@ -91,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(MOVIE_ITEMS, movieItems);
         outState.putString(CURRENT_SORT, currentSortType);
+        outState.putParcelable("layoutManagerState", mLayoutManagerState);
     }
 
     /**
@@ -101,18 +116,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         super.onRestoreInstanceState(savedInstanceState);
         movieItems = savedInstanceState.getParcelableArrayList(MOVIE_ITEMS);
         currentSortType = savedInstanceState.getString(CURRENT_SORT);
+
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (currentSortType.equals(FAVORITE)) {
-            ClearMovieItemList();
-            LoadView();
-        }
+    protected void onPause() {
+        super.onPause();
+        mLayoutManagerState = mGridLayoutManager.onSaveInstanceState();
     }
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         }
 
         // if API key not entered in gradle.properties, end app
-        if (Objects.equals(BuildConfig.API_KEY, "YOUR API KEY")) {
+        if (BuildConfig.API_KEY == "YOUR API KEY") {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage(R.string.api_error)
                     .setCancelable(false)
@@ -154,26 +165,51 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             // get apiKey from gradle.properties
             mApiKey = BuildConfig.API_KEY;
 
-            // set up movies DB to store favorites and movies
-            // MovieDbHelper movieDbHelper = new MovieDbHelper(this);
-            // SQLiteDatabase mDb = movieDbHelper.getWritableDatabase();
+            // Recycler view setup
 
-            //get reference to movie recycler view
-            RecyclerView mMovieItemList = findViewById(R.id.rv_movies);
-            GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
-            mMovieItemList.setLayoutManager(layoutManager);
+            // define poster width in pixels
+            int posterWidth = 700;
+
+            mGridLayoutManager = new GridLayoutManager(this,calculateSpanCount(posterWidth));
+            mMovieItemList =  findViewById(R.id.rv_movies);
+            mMovieItemList.setLayoutManager(mGridLayoutManager);
             mMovieItemList.setHasFixedSize(true);
             mMovieAdapter = new MovieAdapter(movieItems, this);
             mMovieItemList.setAdapter(mMovieAdapter);
+
+            // restore layout if screen rotated
+            if (savedInstanceState != null) {
+                mLayoutManagerState = savedInstanceState.getParcelable("layoutManagerState");
+                mGridLayoutManager.onRestoreInstanceState(mLayoutManagerState);
+            }
 
             //if saved instance is not null and contains movie items, we will restore that instead.
             if (savedInstanceState != null && savedInstanceState.containsKey(MOVIE_ITEMS)) {
                 movieItems = savedInstanceState.getParcelableArrayList(MOVIE_ITEMS);
                 currentSortType = savedInstanceState.getString(CURRENT_SORT, SORT_POPULAR);
             }
+
             LoadView();
         }
     }
+
+    /**
+     * @param posterWidth - Width in pixels of the poster
+     * @return the int to set the span count of the GridLayoutManager
+     *
+     * based on suggestion from first reviewer
+     */
+    private int calculateSpanCount(int posterWidth) {
+        // Information about display (size, density, ...)
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+        // Get the absolute width of display in pixels
+        float screenWidth = metrics.widthPixels;
+
+        return Math.round(screenWidth / posterWidth);
+    }
+
 
         /**
          * This method loads the main view. It first checks if the movieItems is empty or null and in that case
@@ -195,8 +231,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
 
 
-
-   //  Async task to fetch data from network and new data is applied to adapter.
+    //  Async task to fetch data from network and new data is applied to adapter.
 
     @SuppressLint("StaticFieldLeak")
     class NetworkQueryTask extends AsyncTask<URL, Void, String> {
@@ -288,11 +323,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         // get the list of favorite movies
         private ArrayList<Movie> getAllFavoriteMovies() {
             ArrayList<Movie> result = new ArrayList<>();
-            try (Cursor cursor = getContentResolver().query(MovieDBLayout.MovieTable.CONTENT_URI,
+            Cursor cursor = getContentResolver().query(MovieDBLayout.MovieTable.CONTENT_URI,
                     null,
                     null,
                     null,
-                    MovieDBLayout.MovieTable.COLUMN_VOTE_AVERAGE)) {
+                    MovieDBLayout.MovieTable.COLUMN_VOTE_AVERAGE); {
                 while (cursor.moveToNext()) {
 
                     // add movie to favorites list, set favorite flag to true
@@ -309,6 +344,20 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             }
             return result;
         }
+
+
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        if (currentSortType.equals(FAVORITE)) {
+            ClearMovieItemList();
+            LoadView();
+        }
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -361,22 +410,4 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         }
         return super.onOptionsItemSelected(item);
     }
-
-
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
-

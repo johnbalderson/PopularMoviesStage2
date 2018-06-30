@@ -6,14 +6,14 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:layout_gravity="start"
-    android:padding="0dp">
+    android:padding="@dimen/zero_padding">
 
     <ImageView
         android:id="@+id/iv_trailer_youtube"
         android:layout_width="400dp"
         android:layout_height="200dp"
         android:adjustViewBounds="true"
-        android:padding="2dp"
+        android:padding="@dimen/thin_line_height"
         android:scaleType="centerCrop"
         tools:ignore="ContentDescription" />
 </LinearLayout>
