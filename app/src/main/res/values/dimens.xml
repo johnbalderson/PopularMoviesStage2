@@ -1,0 +1,19 @@
+<resources>
+    <dimen name="padding">16dp</dimen>
+    <dimen name="padding_top">60dp</dimen>
+    <dimen name="padding_left">8dp</dimen>
+    <dimen name="padding_view_height">5dp</dimen>
+    <dimen name="padding_2x">32dp</dimen>
+    <dimen name="thin_line_height">2dp</dimen>
+    <dimen name="zero_padding">0dp</dimen>
+    <dimen name="padding_1dp">1dp</dimen>
+    <dimen name="padding_2dp">2dp</dimen>
+    <dimen name="padding_bottom">12dp</dimen>
+    <dimen name="padding_bottom_8">8dp</dimen>
+    <dimen name="text_size_28">28sp</dimen>
+    <dimen name="text_size_22">22sp</dimen>
+    <dimen name="text_size_18">18sp</dimen>
+    <dimen name="text_size_16">16sp</dimen>
+    <dimen name="layout_margin">15sp</dimen>
+    <dimen name="text_margin">10sp</dimen>
+</resources>
